@@ -1,0 +1,135 @@
+#!/usr/bin/env bash
+
+set -euo pipefail
+
+FILE="$1"
+[[ -f "$FILE" ]] || {
+    echo "file not found"
+    exit 1
+}
+
+EXT="${FILE##*.}"
+BASENAME="${FILE%.*}"
+
+# ---------- FORMAT DETECTION ----------
+is_video() {
+    ffprobe -v error -select_streams v -show_entries stream=index \
+        -of csv=p=0 "$FILE" | grep -q .
+}
+
+is_audio() {
+    ffprobe -v error -select_streams a -show_entries stream=index \
+        -of csv=p=0 "$FILE" | grep -q .
+}
+
+# ---------- IMAGE ----------
+edit_image() {
+    ACTION=$(printf "rotate\nblur\nsharpen\ncontrast\nresize\nflip\nmirror\nnoop\n" | fzf)
+
+    case "$ACTION" in
+    rotate)
+        read -p "degrees: " DEG
+        magick "$FILE" -rotate "$DEG" "${BASENAME}_edit.$EXT"
+        ;;
+    blur)
+        magick "$FILE" -blur 0x4 "${BASENAME}_edit.$EXT"
+        ;;
+    sharpen)
+        magick "$FILE" -sharpen 0x2 "${BASENAME}_edit.$EXT"
+        ;;
+    contrast)
+        magick "$FILE" -contrast "${BASENAME}_edit.$EXT"
+        ;;
+    resize)
+        read -p "size (e.g. 800x800): " SIZE
+        magick "$FILE" -resize "$SIZE" "${BASENAME}_edit.$EXT"
+        ;;
+    flip)
+        magick "$FILE" -flip "${BASENAME}_edit.$EXT"
+        ;;
+    mirror)
+        magick "$FILE" -flop "${BASENAME}_edit.$EXT"
+        ;;
+    noop)
+        cp "$FILE" "${BASENAME}_edit.$EXT"
+        ;;
+    esac
+}
+
+# ---------- VIDEO ----------
+edit_video() {
+    ACTION=$(printf "rotate\ncrop\nscale\ngrayscale\nspeed\ntrim\nmirror\nnoop\n" | fzf)
+
+    case "$ACTION" in
+    rotate)
+        printf "90\n180\n270\n" | fzf | {
+            read DEG
+            ffmpeg -i "$FILE" -vf "transpose=$((DEG / 90 - 1))" -c:a copy "${BASENAME}_edit.$EXT"
+        }
+        ;;
+    crop)
+        read -p "crop (w:h:x:y): " CROP
+        ffmpeg -i "$FILE" -vf "crop=$CROP" -c:a copy "${BASENAME}_edit.$EXT"
+        ;;
+    scale)
+        read -p "scale (e.g. 1280:720): " SCALE
+        ffmpeg -i "$FILE" -vf "scale=$SCALE" -c:a copy "${BASENAME}_edit.$EXT"
+        ;;
+    grayscale)
+        ffmpeg -i "$FILE" -vf format=gray -c:a copy "${BASENAME}_edit.$EXT"
+        ;;
+    speed)
+        read -p "speed (e.g. 0.5 / 2.0): " SPEED
+        ffmpeg -i "$FILE" -filter_complex \
+            "[0:v]setpts=PTS/$SPEED[v];[0:a]atempo=$SPEED[a]" \
+            -map "[v]" -map "[a]" "${BASENAME}_edit.$EXT"
+        ;;
+    trim)
+        read -p "start (seconds): " START
+        read -p "duration: " DUR
+        ffmpeg -i "$FILE" -ss "$START" -t "$DUR" -c copy "${BASENAME}_edit.$EXT"
+        ;;
+    mirror)
+        ffmpeg -i "$FILE" -vf "hflip" -c:a copy "${BASENAME}_edit.$EXT"
+        ;;
+    noop)
+        cp "$FILE" "${BASENAME}_edit.$EXT"
+        ;;
+    esac
+}
+
+# ---------- AUDIO ----------
+edit_audio() {
+    ACTION=$(printf "normalize\nfade\nspeed\ntrim\nnoop\n" | fzf)
+
+    case "$ACTION" in
+    normalize)
+        ffmpeg -i "$FILE" -af loudnorm "${BASENAME}_edit.$EXT"
+        ;;
+    fade)
+        read -p "duration (sec): " D
+        ffmpeg -i "$FILE" -af "afade=t=in:d=$D,afade=t=out:d=$D" "${BASENAME}_edit.$EXT"
+        ;;
+    speed)
+        read -p "speed (e.g. 0.5 / 2.0): " SPEED
+        ffmpeg -i "$FILE" -filter:a "atempo=$SPEED" "${BASENAME}_edit.$EXT"
+        ;;
+    trim)
+        read -p "start (sec): " START
+        read -p "duration: " DUR
+        ffmpeg -i "$FILE" -ss "$START" -t "$DUR" "${BASENAME}_edit.$EXT"
+        ;;
+    noop)
+        cp "$FILE" "${BASENAME}_edit.$EXT"
+        ;;
+    esac
+}
+
+# ---------- DISPATCH ----------
+if is_video; then
+    edit_video
+elif is_audio; then
+    edit_audio
+else
+    edit_image
+fi

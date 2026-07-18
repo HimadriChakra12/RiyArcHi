@@ -1,0 +1,31 @@
+#!/bin/bash
+
+url="$1"
+name="$2"
+category="$3"
+
+if [ -z "$url" ] || [ -z "$name" ]; then
+    echo "Usage: webify <url> <name> [category]"
+    exit 1
+fi
+
+appdir="$HOME/.local/share/applications"
+
+mkdir -p "$appdir"
+
+desktop="$appdir/${name}.desktop"
+
+cat > "$desktop" <<EOF
+[Desktop Entry]
+Name=$name
+Exec=surf $url
+Type=Application
+Terminal=false
+Categories=${category:-Network};
+StartupNotify=true
+EOF
+
+chmod +x "$desktop"
+
+echo "Webapp '$name' created."
+echo "Desktop file: $desktop"

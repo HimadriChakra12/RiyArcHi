@@ -1,0 +1,378 @@
+#!/bin/bash
+
+# Scientific Calculator in Bash
+# Supports basic arithmetic, trigonometry, logarithms, and more
+
+# Color codes for better UI
+RED='\033[0;31m'
+GREEN='\033[0;32m'
+YELLOW='\033[1;33m'
+BLUE='\033[0;34m'
+MAGENTA='\033[0;35m'
+CYAN='\033[0;36m'
+NC='\033[0m' # No Color
+BOLD='\033[1m'
+
+# Global variables
+memory=0
+angle_mode="rad"  # rad or deg
+last_result=0
+
+# Function to display the header
+display_header() {
+    clear
+    echo -e "${CYAN}${BOLD}"
+    echo "╔════════════════════════════════════════════════════════════╗"
+    echo "║           SCIENTIFIC CALCULATOR (Bash)                    ║"
+    echo "╚════════════════════════════════════════════════════════════╝"
+    echo -e "${NC}"
+    echo -e "${YELLOW}Angle Mode: ${angle_mode^^} | Memory: $memory | Last Result: $last_result${NC}"
+    echo ""
+}
+
+# Function to display menu
+display_menu() {
+    echo -e "${GREEN}${BOLD}Basic Operations:${NC}"
+    echo "  +, -, *, /, ^, %, sqrt, abs"
+    echo ""
+    echo -e "${GREEN}${BOLD}Trigonometric:${NC}"
+    echo "  sin, cos, tan, asin, acos, atan"
+    echo ""
+    echo -e "${GREEN}${BOLD}Logarithmic & Exponential:${NC}"
+    echo "  log (base 10), ln (natural), exp, pow(base,exp)"
+    echo ""
+    echo -e "${GREEN}${BOLD}Special:${NC}"
+    echo "  pi, e, factorial(n), ceil, floor, round"
+    echo ""
+    echo -e "${GREEN}${BOLD}Memory Operations:${NC}"
+    echo "  ms (store), mr (recall), mc (clear), m+ (add), m- (subtract)"
+    echo ""
+    echo -e "${GREEN}${BOLD}Settings:${NC}"
+    echo "  deg (degree mode), rad (radian mode)"
+    echo ""
+    echo -e "${GREEN}${BOLD}Commands:${NC}"
+    echo "  help (show this menu), clear, quit/exit"
+    echo ""
+    echo -e "${CYAN}Enter expression or command:${NC}"
+}
+
+# Mathematical constants
+PI=3.14159265358979323846
+E=2.71828182845904523536
+
+# Convert degrees to radians
+deg_to_rad() {
+    echo "scale=10; $1 * $PI / 180" | bc -l
+}
+
+# Convert radians to degrees
+rad_to_deg() {
+    echo "scale=10; $1 * 180 / $PI" | bc -l
+}
+
+# Calculate sine
+calc_sin() {
+    local val=$1
+    if [ "$angle_mode" = "deg" ]; then
+        val=$(deg_to_rad $val)
+    fi
+    echo "s($val)" | bc -l
+}
+
+# Calculate cosine
+calc_cos() {
+    local val=$1
+    if [ "$angle_mode" = "deg" ]; then
+        val=$(deg_to_rad $val)
+    fi
+    echo "c($val)" | bc -l
+}
+
+# Calculate tangent
+calc_tan() {
+    local val=$1
+    if [ "$angle_mode" = "deg" ]; then
+        val=$(deg_to_rad $val)
+    fi
+    local sin=$(echo "s($val)" | bc -l)
+    local cos=$(echo "c($val)" | bc -l)
+    if [ "$(echo "$cos == 0" | bc -l)" -eq 1 ]; then
+        echo "Error: Undefined (division by zero)"
+        return 1
+    fi
+    echo "scale=10; $sin / $cos" | bc -l
+}
+
+# Calculate arcsine
+calc_asin() {
+    local val=$1
+    local result=$(echo "scale=10; a(1) * 2 - a(sqrt(1 - $val * $val) / $val)" | bc -l 2>/dev/null)
+    if [ $? -ne 0 ]; then
+        echo "Error: Invalid input for asin"
+        return 1
+    fi
+    if [ "$angle_mode" = "deg" ]; then
+        result=$(rad_to_deg $result)
+    fi
+    echo $result
+}
+
+# Calculate arccosine
+calc_acos() {
+    local val=$1
+    local result=$(echo "scale=10; a(sqrt(1 - $val * $val) / $val)" | bc -l 2>/dev/null)
+    if [ $? -ne 0 ]; then
+        echo "Error: Invalid input for acos"
+        return 1
+    fi
+    if [ "$angle_mode" = "deg" ]; then
+        result=$(rad_to_deg $result)
+    fi
+    echo $result
+}
+
+# Calculate arctangent
+calc_atan() {
+    local val=$1
+    local result=$(echo "a($val)" | bc -l)
+    if [ "$angle_mode" = "deg" ]; then
+        result=$(rad_to_deg $result)
+    fi
+    echo $result
+}
+
+# Calculate natural logarithm
+calc_ln() {
+    echo "l($1)" | bc -l
+}
+
+# Calculate log base 10
+calc_log() {
+    echo "scale=10; l($1) / l(10)" | bc -l
+}
+
+# Calculate exponential
+calc_exp() {
+    echo "e($1)" | bc -l
+}
+
+# Calculate power
+calc_pow() {
+    echo "scale=10; $1 ^ $2" | bc -l
+}
+
+# Calculate square root
+calc_sqrt() {
+    echo "sqrt($1)" | bc -l
+}
+
+# Calculate factorial
+calc_factorial() {
+    local n=$1
+    if [ "$n" -lt 0 ]; then
+        echo "Error: Factorial of negative number"
+        return 1
+    fi
+    if [ "$n" -eq 0 ] || [ "$n" -eq 1 ]; then
+        echo 1
+        return 0
+    fi
+    local result=1
+    for ((i=2; i<=n; i++)); do
+        result=$((result * i))
+    done
+    echo $result
+}
+
+# Calculate absolute value
+calc_abs() {
+    local val=$1
+    if [ "$(echo "$val < 0" | bc -l)" -eq 1 ]; then
+        echo "scale=10; -1 * $val" | bc -l
+    else
+        echo $val
+    fi
+}
+
+# Calculate ceiling
+calc_ceil() {
+    local val=$1
+    local int_part=$(echo "$val / 1" | bc)
+    if [ "$(echo "$val > $int_part" | bc -l)" -eq 1 ]; then
+        echo "$int_part + 1" | bc
+    else
+        echo $int_part
+    fi
+}
+
+# Calculate floor
+calc_floor() {
+    echo "$1 / 1" | bc
+}
+
+# Calculate round
+calc_round() {
+    echo "scale=0; ($1 + 0.5) / 1" | bc
+}
+
+# Process expression
+process_expression() {
+    local expr=$1
+    expr=$(echo "$expr" | tr -d ' ')  # Remove spaces
+    
+    # Handle special commands
+    case $expr in
+        "quit"|"exit")
+            echo -e "${GREEN}Thank you for using Scientific Calculator!${NC}"
+            exit 0
+            ;;
+        "help"|"menu")
+            return 2
+            ;;
+        "clear")
+            return 3
+            ;;
+        "deg")
+            angle_mode="deg"
+            echo -e "${YELLOW}Angle mode set to DEGREES${NC}"
+            return 0
+            ;;
+        "rad")
+            angle_mode="rad"
+            echo -e "${YELLOW}Angle mode set to RADIANS${NC}"
+            return 0
+            ;;
+        "mc")
+            memory=0
+            echo -e "${YELLOW}Memory cleared${NC}"
+            return 0
+            ;;
+        "mr")
+            echo -e "${YELLOW}Memory Recall: $memory${NC}"
+            last_result=$memory
+            return 0
+            ;;
+        "pi")
+            echo $PI
+            last_result=$PI
+            return 0
+            ;;
+        "e")
+            echo $E
+            last_result=$E
+            return 0
+            ;;
+        "")
+            return 0
+            ;;
+    esac
+    
+    # Replace constants
+    expr=$(echo "$expr" | sed "s/pi/$PI/g")
+    expr=$(echo "$expr" | sed "s/e/$E/g")
+    
+    # Handle function calls
+    if [[ $expr =~ ^sin\((.+)\)$ ]]; then
+        result=$(calc_sin ${BASH_REMATCH[1]})
+    elif [[ $expr =~ ^cos\((.+)\)$ ]]; then
+        result=$(calc_cos ${BASH_REMATCH[1]})
+    elif [[ $expr =~ ^tan\((.+)\)$ ]]; then
+        result=$(calc_tan ${BASH_REMATCH[1]})
+    elif [[ $expr =~ ^asin\((.+)\)$ ]]; then
+        result=$(calc_asin ${BASH_REMATCH[1]})
+    elif [[ $expr =~ ^acos\((.+)\)$ ]]; then
+        result=$(calc_acos ${BASH_REMATCH[1]})
+    elif [[ $expr =~ ^atan\((.+)\)$ ]]; then
+        result=$(calc_atan ${BASH_REMATCH[1]})
+    elif [[ $expr =~ ^ln\((.+)\)$ ]]; then
+        result=$(calc_ln ${BASH_REMATCH[1]})
+    elif [[ $expr =~ ^log\((.+)\)$ ]]; then
+        result=$(calc_log ${BASH_REMATCH[1]})
+    elif [[ $expr =~ ^exp\((.+)\)$ ]]; then
+        result=$(calc_exp ${BASH_REMATCH[1]})
+    elif [[ $expr =~ ^pow\((.+),(.+)\)$ ]]; then
+        result=$(calc_pow ${BASH_REMATCH[1]} ${BASH_REMATCH[2]})
+    elif [[ $expr =~ ^sqrt\((.+)\)$ ]]; then
+        result=$(calc_sqrt ${BASH_REMATCH[1]})
+    elif [[ $expr =~ ^factorial\((.+)\)$ ]]; then
+        result=$(calc_factorial ${BASH_REMATCH[1]})
+    elif [[ $expr =~ ^abs\((.+)\)$ ]]; then
+        result=$(calc_abs ${BASH_REMATCH[1]})
+    elif [[ $expr =~ ^ceil\((.+)\)$ ]]; then
+        result=$(calc_ceil ${BASH_REMATCH[1]})
+    elif [[ $expr =~ ^floor\((.+)\)$ ]]; then
+        result=$(calc_floor ${BASH_REMATCH[1]})
+    elif [[ $expr =~ ^round\((.+)\)$ ]]; then
+        result=$(calc_round ${BASH_REMATCH[1]})
+    elif [[ $expr =~ ^ms\((.+)\)$ ]] || [[ $expr = ms ]]; then
+        if [[ $expr =~ ^ms\((.+)\)$ ]]; then
+            memory=$(echo "scale=10; ${BASH_REMATCH[1]}" | bc -l)
+        else
+            memory=$last_result
+        fi
+        echo -e "${YELLOW}Stored in memory: $memory${NC}"
+        return 0
+    elif [[ $expr =~ ^m\+\((.+)\)$ ]] || [[ $expr = "m+" ]]; then
+        if [[ $expr =~ ^m\+\((.+)\)$ ]]; then
+            memory=$(echo "scale=10; $memory + ${BASH_REMATCH[1]}" | bc -l)
+        else
+            memory=$(echo "scale=10; $memory + $last_result" | bc -l)
+        fi
+        echo -e "${YELLOW}Added to memory: $memory${NC}"
+        return 0
+    elif [[ $expr =~ ^m-\((.+)\)$ ]] || [[ $expr = "m-" ]]; then
+        if [[ $expr =~ ^m-\((.+)\)$ ]]; then
+            memory=$(echo "scale=10; $memory - ${BASH_REMATCH[1]}" | bc -l)
+        else
+            memory=$(echo "scale=10; $memory - $last_result" | bc -l)
+        fi
+        echo -e "${YELLOW}Subtracted from memory: $memory${NC}"
+        return 0
+    else
+        # Handle basic arithmetic with bc
+        # Replace ^ with actual power operator for bc
+        result=$(echo "scale=10; $expr" | bc -l 2>/dev/null)
+        if [ $? -ne 0 ]; then
+            echo -e "${RED}Error: Invalid expression${NC}"
+            return 1
+        fi
+    fi
+    
+    if [[ $result =~ ^Error ]]; then
+        echo -e "${RED}$result${NC}"
+        return 1
+    fi
+    
+    # Format result
+    result=$(echo "scale=10; $result / 1" | bc -l)
+    
+    echo -e "${GREEN}${BOLD}Result: $result${NC}"
+    last_result=$result
+}
+
+# Main loop
+main() {
+    display_header
+    display_menu
+    
+    while true; do
+        echo -ne "${CYAN}> ${NC}"
+        read -r input
+        
+        ret_code=$(process_expression "$input")
+        exit_code=$?
+        
+        if [ "$ret_code" = "2" ]; then
+            display_header
+            display_menu
+        elif [ "$ret_code" = "3" ]; then
+            display_header
+            display_menu
+        fi
+        
+        echo ""
+    done
+}
+
+# Start the calculator
+main
