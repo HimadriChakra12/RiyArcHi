@@ -13,13 +13,13 @@ pacup:
 
 dots: dotfiles mimeconf mpv pkgit bash rdfmconf gimp darktable dunst gh git lazygit rofi okular alacritty tmux vim lyconf nvim
 
-base-install: pacup
-	$(PACMAN) -S $(CORE) $(RI) $(XDG) $(GTK) $(UTIL) $(FONT) $(MEDIA) $(GVFS) $(ROFI) $(LANG) $(SHELLUTIL) $(NEED)
+base-install:
+	$(PACMAN) -S $(NEED) $(CORE) $(RI) $(XDG) $(GTK) $(UTILS) $(FONT) $(MEDIA) $(GVFS) $(ROFI) $(LANG) $(SHELLUTIL) 
 
 devel:
 	$(PACMAN) -S $(CLANG) $(NEED)
 
-base: base-install ly devel fetch dtop det wtf rdfm
+base: pacup base-install ly devel fetch dtop det wtf rdfm
 
 x: shot px sxat rsxiv i3
 	$(PACMAN) -S $(XORG)

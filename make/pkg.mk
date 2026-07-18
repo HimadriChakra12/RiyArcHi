@@ -11,7 +11,7 @@ ROFI = rofi rofi-greenclip
 GVFS = gvfs gvfs-afc gvfs-gphoto2 gvfs-mtp gvfs-nfs gvfs-smb
 MEDIA = mpv ffmpeg wf-recorder 
 FONT = noto-fonts ttf-jetbrains-mono-nerd
-UTILS = galculator
+UTILS = galculator lxappearance
 GTK = polkit-gnome gtk-engine-murrine
 XDG = archlinux-xdg-menu xdg-user-dirs-gtk
 RI = songrec xdman-beta-bin jdownloader2 qbittorrent lollypop localsend-bin
@@ -102,8 +102,8 @@ easyeffects:
 
 gtk:
 	$(PACMAN) -S $(GTK)
-	if [ ! -d $HOME/.gtk ]; then
-		git clone https://github.com/Fausto-Korpsvart/Gruvbox-GTK-Theme $HOME/.gtk --depth 1
+	if [ ! -d "$$HOME/.gtk" ]; then \
+		git clone https://github.com/Fausto-Korpsvart/Gruvbox-GTK-Theme "$$HOME/.gtk" --depth 1; \
 	fi
-	cd $HOME/.gtk/themes/ && bash install.sh -n Gruvhim -c dark -l --tweaks medium float outline -s compact
+	cd "$$HOME/.gtk/themes" && bash install.sh -n Gruvhim -c dark -l --tweaks medium float outline -s compact
 	gsettings set org.gnome.desktop.interface color-scheme prefer-dark
