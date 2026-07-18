@@ -3,6 +3,7 @@ include make/dots.mk
 include make/mime.mk
 include make/pkg.mk
 include make/pacman.mk
+include make/input.mk
 
 all: base dots
 
@@ -26,6 +27,13 @@ x: shot px sxat rsxiv i3
 
 way: whot pw swat
 	$(PACMAN) -S $(WAY)
+
+gpu:
+	$(PACMAN) -S xf86-video-intel
+
+xorgconf:
+	sudo cp $(HOME)/riyarchi/xorg.config.d/* -f /etc/X11/xorg.conf.d/
+	ls /etc/X11/xorg.conf.d/
 
 clean:
 	-sudo paccache -r
