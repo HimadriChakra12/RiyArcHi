@@ -11,7 +11,7 @@ REFARG 		= \
 			  --save /etc/pacman.d/mirrorlist
 
 pacinit:
-	sudo cp $(HOME)/.dotfiles/pacman.conf /etc/pacman.conf
+	sudo cp $(HOMEDIR)/.dotfiles/pacman.conf /etc/pacman.conf
 
 reflector: pacinit
 	@$(PACMAN) -Syyu

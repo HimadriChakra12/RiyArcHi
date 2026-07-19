@@ -1,6 +1,9 @@
 help:
 	@echo "Welcome to Riyarchi Make Machine"
 
+HOMEDIR ?= $(shell getent passwd $$(logname 2>/dev/null || echo $(SUDO_USER)) | cut -d: -f6)
+HOMEDIR ?= $(shell getent passwd $$(logname) | cut -d: -f6)
+
 include make/command.mk
 include make/dots.mk
 include make/mime.mk

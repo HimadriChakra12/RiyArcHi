@@ -1,6 +1,4 @@
-PKG = $(HOME)/pkg
-URL = https://github.com/HimadriChakra12
-
+# PAKCAGES
 XORG = xorg-server xorg-xinit xorg-apps xorg-xbacklight xbindkeys xorg-xdpyinfo xss-lock xorg-server xorg-xinit xorg-xauth xorg-xrandr xorg-fonts-misc xorg-xsetroot xclip picom
 EASYEFF = pipewire  pipewire-alsa  pipewire-pulse pipewire-jack wireplumber gst-plugin-pipewire lsp-plugins calf zam-plugins rnnoise easyeffects
 CORE = libnotify dbus nwg-look numlockx brightnessctl redshift acpi arandr alsa-utils zip unzip pavucontrol dex
@@ -14,66 +12,29 @@ FONT = noto-fonts ttf-jetbrains-mono-nerd
 UTILS = galculator lxappearance
 GTK = polkit-gnome gtk-engine-murrine
 XDG = archlinux-xdg-menu xdg-user-dirs-gtk
-RI = songrec xdman-beta-bin jdownloader2 qbittorrent lollypop localsend-bin
-
-MAKE = make && sudo make install
-
-I3 = i3-wm i3blocks i3lock-color i3status eos-settings-i3wm
-
 RDFM = libfm libfm-gtk3 intltool libtool gettext pkg-config autoconf automake
 
+RI = songrec xdman-beta-bin jdownloader2 qbittorrent lollypop localsend-bin
+
+WAY ?=
+I3 = i3-wm i3blocks i3lock-color i3status eos-settings-i3wm
+
 doi:
-	-@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && $(MAKE) && sudo make dmon-install
+	$(CLONE)
+	$(MK) && sudo make dmon-install
 
-rsxiv:
-	-@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && $(MAKE)
-
-fetch:
-	-@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && $(MAKE)
-
-dtop:
-	-@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && $(MAKE)
-
-shot:
-	-@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && $(MAKE)
-
-whot:
-	-@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && $(MAKE)
-
-det:
-	-@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && $(MAKE)
-
-px:
-	-@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && $(MAKE)
-
-pw:
-	-@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && $(MAKE)
-
-wtf:
-	-@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && $(MAKE)
-
-sxat:
-	-@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && bash install.sh
-
-swat:
-	-@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && bash install.sh
+sxat swat:
+	$(CLONE)
+	$(CD) && bash install.sh
 
 rdfm:
 	@$(PACMAN) -S $(RDFM) $(NEED)
-	-@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && bash install.bash
+	$(CLONE)
+	$(CD) && bash install.bash
+
+rsxiv fetch dtop shot whot det px pw wtf:
+	$(CLONE)
+	$(MK)
 
 ly:
 	@sudo pacman -S --noconfirm ly

@@ -1,6 +1,6 @@
 LN   := ln -sfn
-DOTS := $(HOME)/.dotfiles
-CONF := $(HOME)/.config
+DOTS := $(HOMEDIR)/.dotfiles
+CONF := $(HOMEDIR)/.config
 
 define LINK
 	@rm -rf "$(2)"
@@ -12,6 +12,7 @@ dotfiles:
 	@echo "Cloning .dotfiles"
 	-@$(GG) $(URL)/.dotfiles $(DOTS)
 	@echo "Done!"
+
 mimeconf:
 	$(call LINK,$(DOTS)/mimeapps.list,$(CONF)/mimeapps.list)
 mpv:
@@ -19,8 +20,8 @@ mpv:
 pkgit:
 	$(call LINK,$(DOTS)/pkgit,$(CONF)/pkgit)
 bash:
-	$(call LINK,$(DOTS)/bashconf,$(HOME)/bashconf)
-	$(call LINK,$(DOTS)/.bashrc,$(HOME)/.bashrc)
+	$(call LINK,$(DOTS)/bashconf,$(HOMEDIR)/bashconf)
+	$(call LINK,$(DOTS)/.bashrc,$(HOMEDIR)/.bashrc)
 rdfmconf:
 	$(call LINK,$(DOTS)/rdfm,$(CONF)/rdfm)
 gimp:
@@ -46,9 +47,9 @@ okular:
 alacritty:
 	$(call LINK,$(DOTS)/alacritty.toml,$(CONF)/alacritty.toml)
 tmux:
-	$(call LINK,$(DOTS)/.tmux.conf,$(HOME)/.tmux.conf)
+	$(call LINK,$(DOTS)/.tmux.conf,$(HOMEDIR)/.tmux.conf)
 vim:
-	$(call LINK,$(DOTS)/.vimrc,$(HOME)/.vimrc)
+	$(call LINK,$(DOTS)/.vimrc,$(HOMEDIR)/.vimrc)
 lyconf:
 	sudo cp -f "$(DOTS)/ly/config.ini" /etc/ly/
 nvim:
