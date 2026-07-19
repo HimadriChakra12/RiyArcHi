@@ -12,6 +12,7 @@ include make/pacman.mk
 include make/input.mk
 include make/docker.mk
 include make/wifi.mk
+include make/wine.mk
 
 RIYA := $(shell pwd)
 

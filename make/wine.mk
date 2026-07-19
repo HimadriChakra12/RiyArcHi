@@ -22,7 +22,7 @@ GPU := $(shell \
 
 .PHONY: all detect sudo-check install \
         install-arch install-debian install-fedora install-opensuse \
-        gpu-arch verify clean help
+        gpu-arch verify wine-clean help
 
 wine: banner detect sudo-check install verify done
 
@@ -33,8 +33,8 @@ banner:
 	@echo
 
 detect:
-	@echo "Detected package manager: $(PKG_MGR)"
-	@echo "Detected GPU: $(GPU)"
+	@echo "[PKG] Detected package manager: $(PKG_MGR)"
+	@echo "[DETECT] Detected GPU: $(GPU)"
 	@echo
 
 sudo-check:
@@ -43,41 +43,58 @@ sudo-check:
 		exit 1; \
 	fi
 
-install:
 ifeq ($(PKG_MGR),pacman)
-	@$(MAKE) -f $(MAKEFILE_LIST) install-arch
+INSTALL_TARGET := install-arch
 else ifeq ($(PKG_MGR),apt)
-	@$(MAKE) -f $(MAKEFILE_LIST) install-debian
+INSTALL_TARGET := install-debian
 else ifeq ($(PKG_MGR),dnf)
-	@$(MAKE) -f $(MAKEFILE_LIST) install-fedora
+INSTALL_TARGET := install-fedora
 else ifeq ($(PKG_MGR),zypper)
-	@$(MAKE) -f $(MAKEFILE_LIST) install-opensuse
+INSTALL_TARGET := install-opensuse
 else
-	@echo "[ERROR] Unsupported package manager"; \
-	echo; \
-	echo "Please install manually:"; \
-	echo "  - Wine (wine-staging preferred)"; \
-	echo "  - winetricks"; \
-	echo "  - Vulkan drivers for your GPU"; \
-	exit 1
+INSTALL_TARGET := install-unsupported
 endif
 
-install-arch:
+install: $(INSTALL_TARGET)
+
+install-unsupported:
+	@echo "[ERROR] Unsupported package manager"
+	@echo
+	@echo "Please install manually:"
+	@echo "  - Wine (wine-staging preferred)"
+	@echo "  - winetricks"
+	@echo "  - Vulkan drivers for your GPU"
+	@exit 1
+
+install-arch: install-arch-pkgs gpu-arch
+
+install-arch-pkgs:
 	@echo "[PKG] Installing for Arch Linux..."
-	sudo pacman -Syu --needed --noconfirm  wine-staging  winetricks  lib32-gnutls  lib32-mesa  vulkan-icd-loader  lib32-vulkan-icd-loader  gamemode  lib32-gamemode
-	@$(MAKE) -f $(MAKEFILE_LIST) gpu-arch
+	sudo pacman -Syu --needed --noconfirm \
+		wine-staging \
+		winetricks \
+		lib32-gnutls \
+		lib32-mesa \
+		vulkan-icd-loader \
+		lib32-vulkan-icd-loader \
+		gamemode \
+		lib32-gamemode
 
 gpu-arch:
 ifeq ($(GPU),amd)
 	@echo "🎮 Installing AMD GPU drivers..."
-	sudo pacman -S --needed --noconfirm  vulkan-radeon lib32-vulkan-radeon 
+	sudo pacman -S --needed --noconfirm \
+		vulkan-radeon lib32-vulkan-radeon \
 		lib32-mesa-vdpau
 else ifeq ($(GPU),nvidia)
 	@echo "🎮 Installing NVIDIA GPU drivers..."
-	sudo pacman -S --needed --noconfirm  nvidia-utils lib32-nvidia-utils  vulkan-icd-loader lib32-vulkan-icd-loader
+	sudo pacman -S --needed --noconfirm \
+		nvidia-utils lib32-nvidia-utils \
+		vulkan-icd-loader lib32-vulkan-icd-loader
 else ifeq ($(GPU),intel)
 	@echo "🎮 Installing Intel GPU drivers..."
-	sudo pacman -S --needed --noconfirm  vulkan-intel lib32-vulkan-intel
+	sudo pacman -S --needed --noconfirm \
+		vulkan-intel lib32-vulkan-intel
 else
 	@:
 endif
@@ -157,7 +174,7 @@ wine-prefix:
 	@WINEPREFIX="$(PREFIX)" winetricks -q corefonts >/dev/null 2>&1 || echo "⚠️  Font installation warning (non-critical)"
 	@echo "[DONE] Fonts installed"
 	@echo
-	@echo "🎮 Detected GPU: $(GPU)"
+	@echo "[DETECT] Detected GPU: $(GPU)"
 	@vk_icd=""; \
 	case "$(GPU)" in \
 		intel) for p in /usr/share/vulkan/icd.d/intel_icd.x86_64.json /usr/share/vulkan/icd.d/intel_icd.json; do [[ -f "$$p" ]] && vk_icd="$$p" && break; done ;; \
@@ -207,26 +224,7 @@ wine-prefix:
 	@echo "Config:      $(PREFIX)/prefix-info.txt"
 	@echo "Environment: $(PREFIX)/env.sh"
 
-
-verify:
-	@echo
-	@echo "🔍 Verifying installation..."
-	@if ! command -v wine >/dev/null; then \
-		echo "[ERROR] Wine installation failed"; \
-		exit 1; \
-	fi
-	@if ! command -v winetricks >/dev/null; then \
-		echo "[Error] winetricks installation failed"; \
-		exit 1; \
-	fi
-	@echo "[DONE] Wine version: $$(wine --version)"
-	@echo "[DONE] winetricks installed"
-	@if command -v vulkaninfo >/dev/null 2>&1; then \
-		vk_ver=$$(vulkaninfo --summary 2>/dev/null | grep -i "instance version" | head -1 || echo "installed"); \
-		echo "[DONE] Vulkan: $$vk_ver"; \
-	fi
-
-clean:
+wine-clean:
 	@echo "Nothing to clean."
 
 help:
