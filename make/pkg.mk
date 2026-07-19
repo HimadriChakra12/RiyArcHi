@@ -33,7 +33,7 @@ doi:
 	$(CLONE)
 	$(MK) && sudo make dmon-install
 
-sxat swat:
+sxat rsxiv swat:
 	$(CLONE)
 	$(CD) && bash install.sh
 
@@ -42,9 +42,14 @@ rdfm:
 	$(CLONE)
 	$(CD) && bash install.bash
 
-rsxiv fetch dtop shot whot det px pw wtf:
+rot fetch dtop shot whot det px pw wtf:
 	$(CLONE)
 	$(MK)
+
+STYPE = $(shell echo "$$XDG_SESSION_TYPE")
+dacam:
+	$(CLONE)
+	$(MK) BACKEND=$(STYPE)
 
 ly:
 	@sudo pacman -S --noconfirm ly
