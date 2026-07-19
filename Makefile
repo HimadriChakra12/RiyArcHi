@@ -67,7 +67,11 @@ clean:
 pkgclean:
 	cd $(PKG) && sudo rm -rf det/ doi/ dtop/ fetch/ px/ rot/ rsxiv/ shot/ sxat/ wtf/
 
-wifi:
+regdom:
+	iw reg set IN
+	echo 'options cfg80211 ieee80211_regdom=IN' > /etc/modprobe.d/regdom.conf
+
+wifi: regdom
 	iw dev "$$(iw dev | awk '$$1=="Interface"{print $$2}')" set power_save off || true
 	install -Dm644 $(RIYA)/nmconf/wifi-powersave.conf /etc/NetworkManager/conf.d/wifi-powersave.conf
 	install -Dm644 $(RIYA)/nmconf/iwlmvm.conf /etc/modprobe.d/iwlmvm.conf
