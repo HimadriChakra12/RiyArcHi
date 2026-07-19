@@ -25,6 +25,7 @@ help-package:
 	@echo "	make x/way"
 	@echo "	make gpu"
 	@echo "	make waydroid"
+	@echo "	make pkgclean"
 	@echo "	make clean"
 
 help-dots:
