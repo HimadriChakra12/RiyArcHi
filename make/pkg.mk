@@ -84,5 +84,5 @@ gtk:
 	gsettings set org.gnome.desktop.interface color-scheme prefer-dark
 
 pkgclean:
-	cd $(PKG) && sudo rm -rf det/ doi/ dtop/ fetch/ px/ rot/ rsxiv/ shot/ sxat/ wtf/ dacam/
+	cd $(PKG) && sudo rm -rf det/ doi/ dtop/ fetch/ px/ rot/ shot/ sxat/ wtf/ dacam/
 
