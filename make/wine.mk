@@ -17,9 +17,9 @@ GPU := $(shell \
   elif echo "$$gpu_info" | grep -qi intel; then echo intel; \
   else echo unknown; fi)
 
-.PHONY: all detect sudo-check install \
-        install-arch install-debian install-fedora install-opensuse \
-        gpu-arch verify wine-clean help
+.PHONY: wine detect sudo-check install \
+        install-arch \
+        gpu-arch verify wine-clean wine-help
 
 wine: banner detect sudo-check install verify done
 
@@ -195,10 +195,7 @@ wine-prefix:
 	@echo "Config:      $(PREFIX)/prefix-info.txt"
 	@echo "Environment: $(PREFIX)/env.sh"
 
-wine-clean:
-	@echo "Nothing to clean."
-
-help:
+wine-help:
 	@echo "Targets:"
 	@echo "  all      - detect, install, and verify (default)"
 	@echo "  detect   - print detected package manager and GPU"

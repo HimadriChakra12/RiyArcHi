@@ -1,4 +1,4 @@
-help: welcome-banner2 help-package help-dots
+help: welcome-banner2 help-package help-dots help-wine
 
 welcome-banner1:
 	@echo ""
@@ -51,3 +51,10 @@ help-dots:
 	@echo "	make pkgit"
 	@echo "	make mpv"
 	@echo "	make mimeconf"
+
+help-wine:
+	@echo "Wine:"
+	@echo "	make wine(all)"
+	@echo "	make install"
+	@echo "	make wine-prefix PREFIX="
+	@echo "	[NOTICE] wine-prefix defaults to ~/winegames"
