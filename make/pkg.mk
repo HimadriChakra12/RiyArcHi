@@ -13,11 +13,21 @@ UTILS = galculator lxappearance
 GTK = polkit-gnome gtk-engine-murrine
 XDG = archlinux-xdg-menu xdg-user-dirs-gtk
 RDFM = libfm libfm-gtk3 intltool libtool gettext pkg-config autoconf automake
+mp3 = id3 flac
+FLATPAK = com.github.tchx84.Flatseal it.mijorus.gearlever com.github.wwmm.easyeffects
 
 RI = songrec xdman-beta-bin jdownloader2 qbittorrent lollypop localsend-bin
 
 WAY ?=
 I3 = i3-wm i3blocks i3lock-color i3status eos-settings-i3wm
+
+flatpak:
+	$(PACMAN) -S $(NEED) flatpak
+	flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
+	flatpak install $(FLATPAK)
+
+mp3:
+	$(PACMAN) -S $(MP3)
 
 doi:
 	$(CLONE)
@@ -67,3 +77,7 @@ gtk:
 	fi
 	cd "$$HOME/.gtk/themes" && bash install.sh -n Gruvhim -c dark -l --tweaks medium float outline -s compact
 	gsettings set org.gnome.desktop.interface color-scheme prefer-dark
+
+pkgclean:
+	cd $(PKG) && sudo rm -rf det/ doi/ dtop/ fetch/ px/ rot/ rsxiv/ shot/ sxat/ wtf/
+

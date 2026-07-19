@@ -10,6 +10,8 @@ include make/mime.mk
 include make/pkg.mk
 include make/pacman.mk
 include make/input.mk
+include make/docker.mk
+include make/wifi.mk
 
 RIYA := $(shell pwd)
 
@@ -19,6 +21,8 @@ pac: pacinit pacupdate reflector
 
 pacup:
 	$(PACMAN) -Syu
+
+docker: docker-install docker-configure docker-group docker-setup
 
 base-install:
 	$(PACMAN) -S $(NEED) $(CORE) $(RI) $(XDG) $(GTK) $(UTILS) $(FONT) $(MEDIA) $(GVFS) $(ROFI) $(LANG) $(SHELLUTIL) 
@@ -64,25 +68,12 @@ clean:
 	-sudo find /root -type f -size +50M -exec ls -lh {} \; | awk '{ print $$9 ": " $$5 }'
 	-sudo du -hxd1 /opt | sort -h | awk '$$1 ~ /[0-9]M|G/ {print}'
 
-pkgclean:
-	cd $(PKG) && sudo rm -rf det/ doi/ dtop/ fetch/ px/ rot/ rsxiv/ shot/ sxat/ wtf/
-
-regdom:
-	iw reg set IN
-	echo 'options cfg80211 ieee80211_regdom=IN' > /etc/modprobe.d/regdom.conf
-
-wifi: regdom
-	iw dev "$$(iw dev | awk '$$1=="Interface"{print $$2}')" set power_save off || true
-	install -Dm644 $(RIYA)/nmconf/wifi-powersave.conf /etc/NetworkManager/conf.d/wifi-powersave.conf
-	install -Dm644 $(RIYA)/nmconf/iwlmvm.conf /etc/modprobe.d/iwlmvm.conf
-	@CONN=$$(nmcli -t -f NAME,TYPE connection show --active | grep wifi | cut -d: -f1); \
-	if [ -n "$$CONN" ]; then \
-		echo "[+] Active Wi-Fi connection: $$CONN"; \
-		nmcli connection modify "$$CONN" 802-11-wireless.band a || true; \
-		nmcli connection up "$$CONN" || true; \
-	fi
-	mkinitcpio -P
-	@echo "[+] Done. Reboot recommended."
+waydroid:
+	$(PACMAN) -S $(NEED) xorg-xwayland cage waydroid
+	sudo waydroid init
+	sudo waydroid container start
 
 .PHONY: dotfiles mimeconf base dots base base-install x way mime mpv pkgit bash rdfmconf gimp darktable \
-	dunst gh git i3 lazygit rofi okular alacritty tmux vim lyconf nvim shot px sxat rsxiv i3 clean pkgclean
+	dunst gh git i3 lazygit rofi okular alacritty tmux vim lyconf nvim shot px sxat rsxiv i3 clean pkgclean \
+	docker-install docker-configure docker-group docker-setup
+
