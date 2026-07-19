@@ -55,4 +55,8 @@ clean:
 	-sudo find /root -type f -size +50M -exec ls -lh {} \; | awk '{ print $$9 ": " $$5 }'
 	-sudo du -hxd1 /opt | sort -h | awk '$$1 ~ /[0-9]M|G/ {print}'
 
-.PHONY: dotfiles mimeconf base dots base base-install x way mime mpv pkgit bash rdfmconf gimp darktable dunst gh git i3 lazygit rofi okular alacritty tmux vim lyconf nvim shot px sxat rsxiv i3 clean
+pkgclean:
+	cd $(PKG) && sudo rm -rf det/ doi/ dtop/ fetch/ px/ rot/ rsxiv/ shot/ sxat/ wtf/
+
+.PHONY: dotfiles mimeconf base dots base base-install x way mime mpv pkgit bash rdfmconf gimp darktable \
+	dunst gh git i3 lazygit rofi okular alacritty tmux vim lyconf nvim shot px sxat rsxiv i3 clean pkgclean
