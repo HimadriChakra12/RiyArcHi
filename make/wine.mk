@@ -8,9 +8,6 @@ NAME   ?= $(notdir $(PREFIX))
 
 PKG_MGR := $(shell \
   if command -v pacman >/dev/null 2>&1; then echo pacman; \
-  elif command -v apt >/dev/null 2>&1; then echo apt; \
-  elif command -v dnf >/dev/null 2>&1; then echo dnf; \
-  elif command -v zypper >/dev/null 2>&1; then echo zypper; \
   else echo unknown; fi)
 
 GPU := $(shell \
@@ -45,12 +42,6 @@ sudo-check:
 
 ifeq ($(PKG_MGR),pacman)
 INSTALL_TARGET := install-arch
-else ifeq ($(PKG_MGR),apt)
-INSTALL_TARGET := install-debian
-else ifeq ($(PKG_MGR),dnf)
-INSTALL_TARGET := install-fedora
-else ifeq ($(PKG_MGR),zypper)
-INSTALL_TARGET := install-opensuse
 else
 INSTALL_TARGET := install-unsupported
 endif
@@ -98,26 +89,6 @@ else ifeq ($(GPU),intel)
 else
 	@:
 endif
-
-install-debian:
-	@echo "[PKG] Installing for Debian/Ubuntu..."
-	sudo dpkg --add-architecture i386 || true
-	sudo apt update
-	sudo apt install -y wine64 wine32 winetricks libvulkan1 libvulkan1:i386 mesa-vulkan-drivers mesa-vulkan-drivers:i386 gamemode
-ifeq ($(GPU),nvidia)
-	sudo apt install -y nvidia-vulkan-icd nvidia-vulkan-icd:i386 || true
-endif
-
-install-fedora:
-	@echo "[PKG] Installing for Fedora..."
-	sudo dnf install -y wine winetricks vulkan-loader vulkan-loader.i686 mesa-vulkan-drivers mesa-vulkan-drivers.i686 gamemode
-ifeq ($(GPU),nvidia)
-	sudo dnf install -y xorg-x11-drv-nvidia-libs.i686 || true
-endif
-
-install-opensuse:
-	@echo "[PKG] Installing for openSUSE..."
-	sudo zypper install -y wine winetricks libvulkan1 libvulkan1-32bit gamemode
 
 verify:
 	@echo
