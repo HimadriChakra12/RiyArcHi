@@ -32,7 +32,7 @@ devel:
 	$(PACMAN) -S $(CLANG) $(NEED)
 
 dots: dotfiles mimeconf mpv pkgit bash rdfmconf gimp darktable dunst gh git lazygit rofi okular alacritty tmux vim lyconf nvim
-base: pacup base-install ly devel fetch dtop det wtf rdfm dacam
+base: pacup base-install ly devel fetch dtop det wtf rdfm dacam chromium
 
 xorginit:
 	$(PACMAN) -S $(XORG)
