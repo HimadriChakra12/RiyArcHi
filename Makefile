@@ -1,5 +1,5 @@
-help:
-	@echo "Welcome to Riyarchi Make Machine"
+include make/help.mk
+
 
 HOMEDIR ?= $(shell getent passwd $$(logname 2>/dev/null || echo $(SUDO_USER)) | cut -d: -f6)
 HOMEDIR ?= $(shell getent passwd $$(logname) | cut -d: -f6)
@@ -15,7 +15,7 @@ include make/wifi.mk
 
 RIYA := $(shell pwd)
 
-all: base dots
+all: welcome-banner2 base dots
 
 pac: pacinit pacupdate reflector
 
