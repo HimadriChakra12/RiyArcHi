@@ -12,7 +12,7 @@ docker_pkgs=(
 )
 
 echo -e "${GREEN}Installing Docker & Plugins!${NC}"
-yay -S --noconfirm "${docker_pkgs[@]}"
+sudo pacman -S --noconfirm "${docker_pkgs[@]}"
 
 ### MUST BE ROOT ###
 if [[ $EUID -ne 0 ]]; then

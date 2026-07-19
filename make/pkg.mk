@@ -16,65 +16,64 @@ GTK = polkit-gnome gtk-engine-murrine
 XDG = archlinux-xdg-menu xdg-user-dirs-gtk
 RI = songrec xdman-beta-bin jdownloader2 qbittorrent lollypop localsend-bin
 
+MAKE = make && sudo make install
+
 I3 = i3-wm i3blocks i3lock-color i3status eos-settings-i3wm
 
 RDFM = libfm libfm-gtk3 intltool libtool gettext pkg-config autoconf automake
 
 doi:
-	@rm -rf $(PKG)/$@
-	@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && make && sudo make install && sudo make dmon-install
+	-@$(GG) $(URL)/$@ $(PKG)/$@
+	@cd $(PKG)/$@ && $(MAKE) && sudo make dmon-install
 
 rsxiv:
-	@rm -rf $(PKG)/$@
-	@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && make && sudo make install
+	-@$(GG) $(URL)/$@ $(PKG)/$@
+	@cd $(PKG)/$@ && $(MAKE)
+
+fetch:
+	-@$(GG) $(URL)/$@ $(PKG)/$@
+	@cd $(PKG)/$@ && $(MAKE)
+
+dtop:
+	-@$(GG) $(URL)/$@ $(PKG)/$@
+	@cd $(PKG)/$@ && $(MAKE)
+
+shot:
+	-@$(GG) $(URL)/$@ $(PKG)/$@
+	@cd $(PKG)/$@ && $(MAKE)
+
+whot:
+	-@$(GG) $(URL)/$@ $(PKG)/$@
+	@cd $(PKG)/$@ && $(MAKE)
+
+det:
+	-@$(GG) $(URL)/$@ $(PKG)/$@
+	@cd $(PKG)/$@ && $(MAKE)
+
+px:
+	-@$(GG) $(URL)/$@ $(PKG)/$@
+	@cd $(PKG)/$@ && $(MAKE)
+
+pw:
+	-@$(GG) $(URL)/$@ $(PKG)/$@
+	@cd $(PKG)/$@ && $(MAKE)
+
+wtf:
+	-@$(GG) $(URL)/$@ $(PKG)/$@
+	@cd $(PKG)/$@ && $(MAKE)
+
+sxat:
+	-@$(GG) $(URL)/$@ $(PKG)/$@
+	@cd $(PKG)/$@ && bash install.sh
+
+swat:
+	-@$(GG) $(URL)/$@ $(PKG)/$@
+	@cd $(PKG)/$@ && bash install.sh
 
 rdfm:
 	@$(PACMAN) -S $(RDFM) $(NEED)
-	@rm -rf $(PKG)/$@
-	@$(GG) $(URL)/$@ $(PKG)/$@
+	-@$(GG) $(URL)/$@ $(PKG)/$@
 	@cd $(PKG)/$@ && bash install.bash
-
-fetch:
-	@rm -rf $(PKG)/$@
-	@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && make && sudo make install
-
-dtop:
-	@rm -rf $(PKG)/$@
-	@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && make && sudo make install
-
-shot:
-	@rm -rf $(PKG)/$@
-	@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && make && sudo make install
-
-det:
-	@rm -rf $(PKG)/$@
-	@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && make && sudo make install
-
-px:
-	@rm -rf $(PKG)/$@
-	@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && make && sudo make install
-
-sxat:
-	@rm -rf $(PKG)/$@
-	@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && bash install.sh
-
-wtf:
-	@rm -rf $(PKG)/$@
-	@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && make && sudo make install
-
-swat:
-	@rm -rf $(PKG)/$@
-	@$(GG) $(URL)/$@ $(PKG)/$@
-	@cd $(PKG)/$@ && bash install.sh
 
 ly:
 	@sudo pacman -S --noconfirm ly
@@ -83,7 +82,7 @@ ly:
 		sudo systemctl enable ly@tty2.service
 
 firefox:
-	@$(GG) --no-single-branch $(URL)/$(USC) $(PKG)/$(USC)
+	-@$(GG) --no-single-branch $(URL)/$(USC) $(PKG)/$(USC)
 	@cd $(PKG)/$(USC) && for branch in $$(git branch -r | grep -v HEAD | grep -v master | grep -v main | sed 's/origin\///'); do git checkout -b $$branch origin/$$branch; done
 	@git checkout -b main
 	@bash $(PKG)/userChrome/firefox.sh
