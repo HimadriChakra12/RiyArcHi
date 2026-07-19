@@ -1,7 +1,7 @@
 # PAKCAGES
 XORG = xorg-server xorg-xinit xorg-apps xorg-xbacklight xbindkeys xorg-xdpyinfo xss-lock xorg-server xorg-xinit xorg-xauth xorg-xrandr xorg-fonts-misc xorg-xsetroot xclip picom
 EASYEFF = pipewire  pipewire-alsa  pipewire-pulse pipewire-jack wireplumber gst-plugin-pipewire lsp-plugins calf zam-plugins rnnoise easyeffects
-CORE = libnotify dbus nwg-look numlockx brightnessctl redshift acpi arandr alsa-utils zip unzip pavucontrol dex
+CORE = libnotify dbus nwg-look numlockx brightnessctl redshift acpi arandr alsa-utils zip unzip pavucontrol dex pacman-contrib
 SHELLUTIL = curl github-cli lazygit neovim unzip 7zip zoxide awesome-terminal-fonts yt-dlp sysstat tumbler playerctl network-manager-applet wlctl-bin bluetui eza
 CLANG = clang gcc
 LANG = python python-pipx go rustup jq
@@ -85,4 +85,8 @@ gtk:
 
 pkgclean:
 	cd $(PKG) && sudo rm -rf det/ doi/ dtop/ fetch/ px/ rot/ shot/ sxat/ wtf/ dacam/
+
+chromium:
+	curl -Lo $(HOME)/Downloads/chromium-bin.pkg.tar.zst https://github.com/HimadriChakra12/ri/releases/download/chromium/chromium-bin-138.0.7204.183-1-x86_64.pkg.tar.zst
+	sudo pacman -U $(HOME)/Downloads/chromium-bin.pkg.tar.zst
 
