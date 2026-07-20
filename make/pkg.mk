@@ -1,4 +1,3 @@
-
 APP = share/applications
 
 ZOTEROURL = https://download.zotero.org/client/release/9.0.6/Zotero-9.0.6_linux-x86_64.tar.xz
@@ -95,12 +94,20 @@ chromium:
 	curl -Lo $(HOMEDIR)/Downloads/chromium-bin.pkg.tar.zst https://github.com/HimadriChakra12/ri/releases/download/chromium/chromium-bin-138.0.7204.183-1-x86_64.pkg.tar.zst
 	sudo pacman -U $(HOME)/Downloads/chromium-bin.pkg.tar.zst
 
-zotero:
-	curl -Lo "$(HOMEDIR)/Downloads/Zotero-9.0.6_linux-x86_64.tar.xz" \
+zotero-arc:
+	@curl -Lo "$(HOMEDIR)/Downloads/Zotero-9.0.6_linux-x86_64.tar.xz" \
 		$(ZOTEROURL)
-	cd "$(HOMEDIR)/Downloads" && \
+	@cd "$(HOMEDIR)/Downloads" && \
 		tar xf Zotero-9.0.6_linux-x86_64.tar.xz && \
 		rm -rf "$(PKG)/Zotero" && \
-		mv Zotero_linux-x86_64 "$(PKG)/Zotero" && \
+		mv Zotero_linux-x86_64 "$(PKG)/Zotero"
+
+zotero-install:
 		install -Dm644 "$(PKG)/Zotero/zotero.desktop" "$(HOMEDIR)/.local/$(APP)/zotero.desktop" && \
-		sudo install -Dm644 "$(PKG)/Zotero/zotero.desktop" "/usr/$(APP)/zotero.desktop"
+		sudo install -Dm644 "$(PKG)/Zotero/zotero.desktop" "/usr/$(APP)/zotero.desktop" && \
+		sudo install -Dm644 "$(PKG)/Zotero/zotero" "/usr/local/bin/zotero" && \
+		sudo install -Dm644 "$(PKG)/Zotero/zotero" "/usr//bin/zotero" && \
+		sudo install -Dm644 "$(PKG)/Zotero/zotero-bin" "/usr/local/bin/zotero-bin" && \
+		sudo install -Dm644 "$(PKG)/Zotero/zotero-bin" "/usr/bin/zotero-bin"
+
+zotero: zotero-arc zotero-install
