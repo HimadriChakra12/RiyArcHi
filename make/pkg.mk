@@ -1,3 +1,8 @@
+
+APP = share/applications
+
+ZOTEROURL = https://download.zotero.org/client/release/9.0.6/Zotero-9.0.6_linux-x86_64.tar.xz
+
 # PAKCAGES
 XORG = xorg-server xorg-xinit xorg-apps xorg-xbacklight xbindkeys xorg-xdpyinfo xss-lock xorg-server xorg-xinit xorg-xauth xorg-xrandr xorg-fonts-misc xorg-xsetroot xclip picom
 EASYEFF = pipewire  pipewire-alsa  pipewire-pulse pipewire-jack wireplumber gst-plugin-pipewire lsp-plugins calf zam-plugins rnnoise easyeffects
@@ -87,6 +92,15 @@ pkgclean:
 	cd $(PKG) && sudo rm -rf det/ doi/ dtop/ fetch/ px/ rot/ shot/ sxat/ wtf/ dacam/
 
 chromium:
-	curl -Lo $(HOME)/Downloads/chromium-bin.pkg.tar.zst https://github.com/HimadriChakra12/ri/releases/download/chromium/chromium-bin-138.0.7204.183-1-x86_64.pkg.tar.zst
+	curl -Lo $(HOMEDIR)/Downloads/chromium-bin.pkg.tar.zst https://github.com/HimadriChakra12/ri/releases/download/chromium/chromium-bin-138.0.7204.183-1-x86_64.pkg.tar.zst
 	sudo pacman -U $(HOME)/Downloads/chromium-bin.pkg.tar.zst
 
+zotero:
+	curl -Lo "$(HOMEDIR)/Downloads/Zotero-9.0.6_linux-x86_64.tar.xz" \
+		$(ZOTEROURL)
+	cd "$(HOMEDIR)/Downloads" && \
+		tar xf Zotero-9.0.6_linux-x86_64.tar.xz && \
+		rm -rf "$(PKG)/Zotero" && \
+		mv Zotero_linux-x86_64 "$(PKG)/Zotero" && \
+		install -Dm644 "$(PKG)/Zotero/zotero.desktop" "$(HOMEDIR)/.local/$(APP)/zotero.desktop" && \
+		sudo install -Dm644 "$(PKG)/Zotero/zotero.desktop" "/usr/$(APP)/zotero.desktop"

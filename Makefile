@@ -16,7 +16,13 @@ include make/wine.mk
 
 RIYA := $(shell pwd)
 
-all: welcome-banner2 base dots
+all: welcome-banner2 time base dots
+
+time:
+	sudo timedatectl set-timezone Asia/Dhaka
+
+tty:
+	sudo usermod -aG tty himadri
 
 pac: pacinit pacupdate reflector
 
@@ -76,5 +82,5 @@ waydroid:
 
 .PHONY: dotfiles mimeconf base dots base base-install x way mime mpv pkgit bash rdfmconf gimp darktable \
 	dunst gh git i3 lazygit rofi okular alacritty tmux vim lyconf nvim shot px sxat rsxiv i3 clean pkgclean \
-	docker-install docker-configure docker-group docker-setup
+	docker-install docker-configure docker-group docker-setup zotero chromium
 
