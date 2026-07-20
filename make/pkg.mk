@@ -103,11 +103,14 @@ zotero-arc:
 		mv Zotero_linux-x86_64 "$(PKG)/Zotero"
 
 zotero-install:
+	sudo chmod +x "$(PKG)/Zotero/zotero" "$(PKG)/Zotero/zotero-bin" "/usr/local/bin/zotero-bin" "/usr/local/bin/zotero" "/usr/local/bin/zotero" "/usr/local/bin/zotero" && \
+		sed -i 's|^Exec=.*|Exec=zotero|' "$(PKG)/Zotero/zotero.desktop" && \
 		install -Dm644 "$(PKG)/Zotero/zotero.desktop" "$(HOMEDIR)/.local/$(APP)/zotero.desktop" && \
 		sudo install -Dm644 "$(PKG)/Zotero/zotero.desktop" "/usr/$(APP)/zotero.desktop" && \
-		sudo install -Dm644 "$(PKG)/Zotero/zotero" "/usr/local/bin/zotero" && \
-		sudo install -Dm644 "$(PKG)/Zotero/zotero" "/usr//bin/zotero" && \
-		sudo install -Dm644 "$(PKG)/Zotero/zotero-bin" "/usr/local/bin/zotero-bin" && \
-		sudo install -Dm644 "$(PKG)/Zotero/zotero-bin" "/usr/bin/zotero-bin"
+		sudo rm -f "/usr/local/bin/zotero-bin" "/usr/local/bin/zotero" "/usr/bin/zotero" "/usr/bin/zotero-bin" && \
+		sudo ln -s "$(PKG)/Zotero/zotero" "/usr/local/bin/zotero" && \
+		sudo ln -s "$(PKG)/Zotero/zotero" "/usr/bin/zotero" && \
+		sudo ln -s "$(PKG)/Zotero/zotero-bin" "/usr/local/bin/zotero-bin" && \
+		sudo ln -s "$(PKG)/Zotero/zotero-bin" "/usr/bin/zotero-bin"
 
 zotero: zotero-arc zotero-install
