@@ -1,20 +1,54 @@
 #!/usr/bin/env bash
-# wine-setup-photoshop.sh - Photoshop CS6 Wine Setup (VERBOSE + AUTO aria2c)
-# Version: 1.2
+# wine-setup-photoshop.sh - Photoshop CS6 Wine Setup (Arch Linux only)
+# Version: 3.0
 
 set -euo pipefail
-set -x   # FULL VERBOSITY
 
-# ============================================================================
-# Configuration
-# ============================================================================
 WINEPREFIX="${1:-}"
 ENABLE_DXVK=0
 MEMORY_SIZE="2048"
 
-# ============================================================================
+# ----------------------------------------------------------------------------
+# Display helpers
+# ----------------------------------------------------------------------------
+if [[ -t 1 ]]; then
+  C_DIM=$'\033[2m'; C_BOLD=$'\033[1m'
+  C_OK=$'\033[32m'; C_WARN=$'\033[33m'; C_ERR=$'\033[31m'; C_INFO=$'\033[36m'
+  C_RESET=$'\033[0m'
+else
+  C_DIM=""; C_BOLD=""; C_OK=""; C_WARN=""; C_ERR=""; C_INFO=""; C_RESET=""
+fi
+
+TOTAL_STEPS=8
+STEP=0
+
+bar() {
+  local pct=$1 width=30
+  local filled=$(( pct * width / 100 ))
+  local empty=$(( width - filled ))
+  printf "%s" "["
+  printf "%0.s#" $(seq 1 "$filled") 2>/dev/null
+  printf "%0.s." $(seq 1 "$empty") 2>/dev/null
+  printf "%s" "]"
+}
+
+step() {
+  STEP=$((STEP + 1))
+  local pct=$(( STEP * 100 / TOTAL_STEPS ))
+  printf "\n%s%s %3d%%%s  %s%d/%d%s  %s%s%s\n" \
+    "$C_BOLD" "$(bar "$pct")" "$pct" "$C_RESET" \
+    "$C_DIM" "$STEP" "$TOTAL_STEPS" "$C_RESET" \
+    "$C_INFO" "$1" "$C_RESET"
+}
+
+ok()    { printf "  %s[OK]%s    %s\n"    "$C_OK"   "$C_RESET" "$1"; }
+info()  { printf "  %s[INFO]%s  %s\n"    "$C_INFO" "$C_RESET" "$1"; }
+warn()  { printf "  %s[WARN]%s  %s\n"    "$C_WARN" "$C_RESET" "$1"; }
+fail()  { printf "  %s[ERROR]%s %s\n"    "$C_ERR"  "$C_RESET" "$1"; exit 1; }
+
+# ----------------------------------------------------------------------------
 # Usage
-# ============================================================================
+# ----------------------------------------------------------------------------
 show_usage() {
   cat <<EOF
 Usage: $0 PREFIX [OPTIONS]
@@ -30,104 +64,96 @@ EOF
   exit 0
 }
 
-shift || show_usage
+[[ $# -eq 0 ]] && show_usage
+shift
 
 while [[ $# -gt 0 ]]; do
   case "$1" in
     --with-dxvk) ENABLE_DXVK=1; shift ;;
     --memory) MEMORY_SIZE="$2"; shift 2 ;;
     -h|--help) show_usage ;;
-    *) echo "Unknown option: $1"; show_usage ;;
+    *) fail "Unknown option: $1" ;;
   esac
 done
 
-[[ -z "$WINEPREFIX" ]] && { echo "❌ PREFIX required"; exit 1; }
-[[ ! -d "$WINEPREFIX" ]] && { echo "❌ Prefix not found: $WINEPREFIX"; exit 1; }
+[[ -z "$WINEPREFIX" ]] && fail "PREFIX required"
+[[ ! -d "$WINEPREFIX" ]] && fail "Prefix not found: $WINEPREFIX"
+command -v pacman >/dev/null 2>&1 || fail "This script targets Arch Linux (pacman) only"
 
 export WINEPREFIX
 
-# ============================================================================
-# Automatic aria2c installation
-# ============================================================================
-install_aria2() {
-  echo "📦 Attempting to install aria2..."
+printf "%s== Photoshop CS6 Wine Setup ==%s\n" "$C_BOLD" "$C_RESET"
+printf "%sprefix:%s %s   %smemory:%s %sMB   %sdxvk:%s %s\n\n" \
+  "$C_DIM" "$C_RESET" "$WINEPREFIX" "$C_DIM" "$C_RESET" "$MEMORY_SIZE" "$C_DIM" "$C_RESET" "$([[ $ENABLE_DXVK -eq 1 ]] && echo on || echo off)"
 
-  if command -v apt >/dev/null 2>&1; then
-    sudo apt update
-    sudo apt install -y aria2
-  elif command -v dnf >/dev/null 2>&1; then
-    sudo dnf install -y aria2
-  elif command -v pacman >/dev/null 2>&1; then
-    sudo pacman -Sy --noconfirm aria2
-  elif command -v zypper >/dev/null 2>&1; then
-    sudo zypper install -y aria2
-  else
-    echo "❌ Unsupported package manager. Install aria2 manually."
-    return 1
-  fi
-}
+# ----------------------------------------------------------------------------
+# 1. Dependency check
+# ----------------------------------------------------------------------------
+step "Checking dependencies"
+MISSING=()
+for pkg_bin in "wine:wine" "winetricks:winetricks" "aria2c:aria2"; do
+  bin="${pkg_bin%%:*}"; pkg="${pkg_bin##*:}"
+  command -v "$bin" >/dev/null 2>&1 || MISSING+=("$pkg")
+done
 
-echo "🔍 Checking for aria2c..."
-if ! command -v aria2c >/dev/null 2>&1; then
-  echo "⚠️  aria2c not found"
-  install_aria2 || echo "⚠️ aria2 installation failed"
+if [[ ${#MISSING[@]} -gt 0 ]]; then
+  info "Installing missing packages: ${MISSING[*]}"
+  sudo pacman -Sy --needed --noconfirm "${MISSING[@]}"
 fi
+ok "All dependencies present"
 
-if command -v aria2c >/dev/null 2>&1; then
-  echo "✅ aria2c enabled (16 connections)"
-  export WINETRICKS_DOWNLOADER=aria2c
-  export ARIA2C_OPTS="-x 16 -s 16 -k 1M \
-    --file-allocation=trunc \
-    --continue=true \
-    --retry-wait=5 \
-    --max-tries=0 \
-    --summary-interval=5"
-else
-  echo "⚠️ Proceeding without aria2c (downloads may be slow)"
-fi
-
+export WINETRICKS_DOWNLOADER=aria2c
+export ARIA2C_OPTS="-x 16 -s 16 -k 1M --file-allocation=trunc --continue=true --retry-wait=5 --max-tries=0 --summary-interval=5"
 export WINETRICKS_VERBOSE=1
 export WINEDEBUG=err+all,warn+all
+ok "aria2c enabled (16 connections)"
 
-# ============================================================================
-# Photoshop detection
-# ============================================================================
+# ----------------------------------------------------------------------------
+# 2. Photoshop detection
+# ----------------------------------------------------------------------------
+step "Scanning for existing Photoshop install"
 PS_PATHS=(
   "$WINEPREFIX/drive_c/Program Files/Adobe/Adobe Photoshop CS6/Photoshop.exe"
   "$WINEPREFIX/drive_c/Program Files (x86)/Adobe/Adobe Photoshop CS6/Photoshop.exe"
   "$WINEPREFIX/drive_c/Program Files/Adobe/Adobe Photoshop CS6 (64 Bit)/Photoshop.exe"
   "$WINEPREFIX/drive_c/Program Files/PhotoshopPortable/PhotoshopCS6Portable.exe"
 )
-
 FOUND_PS=""
 for p in "${PS_PATHS[@]}"; do
   [[ -f "$p" ]] && FOUND_PS="$p" && break
 done
+[[ -n "$FOUND_PS" ]] && ok "Found: $FOUND_PS" || warn "Not found yet (install it into the prefix manually)"
 
-# ============================================================================
-# Winetricks installs (VERBOSE)
-# ============================================================================
-echo "📝 Installing core fonts..."
-winetricks corefonts || true
+# ----------------------------------------------------------------------------
+# 3-6. Winetricks installs
+# ----------------------------------------------------------------------------
+step "Installing fonts"
+winetricks -q corefonts >/dev/null 2>&1 || warn "corefonts step reported an issue"
+ok "corefonts"
 
-echo "📦 Installing Visual C++ runtimes..."
-winetricks vcrun2008 vcrun2010 vcrun2012 vcrun2013 || true
+step "Installing VC++ runtimes"
+winetricks -q vcrun2008 vcrun2010 vcrun2012 vcrun2013 >/dev/null 2>&1 || warn "vcrun step reported an issue"
+ok "vcrun2008 vcrun2010 vcrun2012 vcrun2013"
 
-echo "📦 Installing graphics libraries..."
-winetricks msxml3 msxml6 gdiplus atmlib || true
+step "Installing graphics libraries"
+winetricks -q msxml3 msxml6 gdiplus atmlib >/dev/null 2>&1 || warn "graphics libs step reported an issue"
+ok "msxml3 msxml6 gdiplus atmlib"
 
-echo "📦 Installing DirectX..."
-winetricks d3dx9 d3dcompiler_43 d3dcompiler_47 || true
-
+step "Installing DirectX components"
+winetricks -q d3dx9 d3dcompiler_43 d3dcompiler_47 >/dev/null 2>&1 || warn "DirectX step reported an issue"
+ok "d3dx9 d3dcompiler_43 d3dcompiler_47"
 if [[ "$ENABLE_DXVK" -eq 1 ]]; then
-  echo "🎮 Installing DXVK..."
-  winetricks dxvk || true
+  info "Installing DXVK (experimental)"
+  winetricks -q dxvk >/dev/null 2>&1 || warn "dxvk step reported an issue"
+  ok "dxvk"
 fi
 
-# ============================================================================
-# Registry Tweaks
-# ============================================================================
-cat > /tmp/wine-photoshop.reg <<REG
+# ----------------------------------------------------------------------------
+# 7. Registry tweaks
+# ----------------------------------------------------------------------------
+step "Applying registry tweaks"
+REG_FILE="$(mktemp)"
+cat > "$REG_FILE" <<REG
 Windows Registry Editor Version 5.00
 
 [HKEY_CURRENT_USER\\Software\\Wine\\Direct3D]
@@ -142,13 +168,14 @@ Windows Registry Editor Version 5.00
 [HKEY_CURRENT_USER\\Software\\Wine\\DllOverrides]
 "winemenubuilder.exe"=""
 REG
+wine regedit "$REG_FILE" >/dev/null 2>&1
+rm -f "$REG_FILE"
+ok "Direct3D + DllOverrides written"
 
-wine regedit /tmp/wine-photoshop.reg
-rm -f /tmp/wine-photoshop.reg
-
-# ============================================================================
-# Environment
-# ============================================================================
+# ----------------------------------------------------------------------------
+# 8. Environment + launcher
+# ----------------------------------------------------------------------------
+step "Writing environment and launcher"
 cat > "$WINEPREFIX/photoshop-env.sh" <<EOF
 #!/usr/bin/env bash
 export STAGING_SHARED_MEMORY=1
@@ -157,12 +184,10 @@ export WINE_CPU_TOPOLOGY=4:0
 EOF
 chmod +x "$WINEPREFIX/photoshop-env.sh"
 
-# ============================================================================
-# Launcher
-# ============================================================================
 cat > "$WINEPREFIX/run-photoshop" <<'EOF'
 #!/usr/bin/env bash
 DIR="$(cd "$(dirname "$0")" && pwd)"
+export WINEPREFIX="$DIR"
 source "$DIR/photoshop-env.sh"
 
 PS_PATHS=(
@@ -178,24 +203,17 @@ for p in "${PS_PATHS[@]}"; do
   [[ -f "$p" ]] && exec wine "$p" "$@"
 done
 
-echo "❌ Photoshop not found"
+echo "[ERROR] Photoshop not found"
 exit 1
 EOF
-
 chmod +x "$WINEPREFIX/run-photoshop"
-
 [[ -n "$FOUND_PS" ]] && echo "$FOUND_PS" > "$WINEPREFIX/photoshop-path.txt"
+ok "run-photoshop launcher ready"
 
-# ============================================================================
+# ----------------------------------------------------------------------------
 # Summary
-# ============================================================================
+# ----------------------------------------------------------------------------
+printf "\n%s%s%s\n" "$C_OK" "$(bar 100) 100%  setup complete" "$C_RESET"
 echo
-echo "════════════════════════════════════════"
-echo "✅ Photoshop CS6 Wine setup COMPLETE"
-echo "════════════════════════════════════════"
-echo
-echo "Launch Photoshop with:"
-echo "  $WINEPREFIX/run-photoshop"
-echo
-echo "ℹ️ Safe to re-run this script at any time."
-echo "ℹ️ aria2c will resume interrupted downloads."
+echo "[RUN]  $WINEPREFIX/run-photoshop"
+echo "[NOTE] Safe to re-run this script; aria2c resumes interrupted downloads"

@@ -3,8 +3,8 @@ set -e
 
 if command -v microsoft-edge-beta >/dev/null; then
     BROW=microsoft-edge-beta
-elif command -v chromium >/dev/null; then
-    BROW=chromium
+elif command -v chromium-bin >/dev/null; then
+    BROW=chromium-bin
 else
     echo "No supported browser found (Edge or Chromium)."
     exit 1

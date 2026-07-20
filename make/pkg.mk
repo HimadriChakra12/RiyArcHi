@@ -1,7 +1,7 @@
 # PAKCAGES
 XORG = xorg-server xorg-xinit xorg-apps xorg-xbacklight xbindkeys xorg-xdpyinfo xss-lock xorg-server xorg-xinit xorg-xauth xorg-xrandr xorg-fonts-misc xorg-xsetroot xclip picom
 EASYEFF = pipewire  pipewire-alsa  pipewire-pulse pipewire-jack wireplumber gst-plugin-pipewire lsp-plugins calf zam-plugins rnnoise easyeffects
-CORE = libnotify dbus nwg-look numlockx brightnessctl redshift acpi arandr alsa-utils zip unzip pavucontrol dex pacman-contrib
+CORE = libnotify dbus nwg-look numlockx brightnessctl redshift acpi arandr alsa-utils zip unzip pavucontrol dex pacman-contrib 
 SHELLUTIL = curl github-cli lazygit neovim unzip 7zip zoxide awesome-terminal-fonts yt-dlp sysstat tumbler playerctl network-manager-applet wlctl-bin bluetui eza
 CLANG = clang gcc
 LANG = python python-pipx go rustup jq
@@ -19,7 +19,7 @@ FLATPAK = com.github.tchx84.Flatseal it.mijorus.gearlever com.github.wwmm.easyef
 RI = songrec xdman-beta-bin jdownloader2 qbittorrent lollypop localsend-bin
 
 WAY ?=
-I3 = i3-wm i3blocks i3lock-color i3status eos-settings-i3wm
+I3 = i3-wm i3blocks i3lock-color i3status eos-settings-i3wm libx11
 
 flatpak:
 	$(PACMAN) -S $(NEED) flatpak
