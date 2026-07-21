@@ -25,6 +25,9 @@ RI = songrec xdman-beta-bin jdownloader2 qbittorrent lollypop localsend-bin
 WAY ?=
 I3 = i3-wm i3blocks i3lock-color i3status eos-settings-i3wm libx11
 
+mingw:
+	$(PACMAN) -S mingw-w64-gcc
+
 flatpak:
 	$(PACMAN) -S $(NEED) flatpak
 	flatpak remote-add --if-not-exists flathub https://dl.flathub.org/repo/flathub.flatpakrepo
