@@ -22,8 +22,6 @@ FLATPAK = com.github.tchx84.Flatseal it.mijorus.gearlever com.github.wwmm.easyef
 
 RI = songrec xdman-beta-bin jdownloader2 qbittorrent lollypop localsend-bin gnome-network-displays
 
-BAPH = onlyoffice-bin
-
 WAY ?=
 I3 = i3-wm i3blocks i3lock-color i3status eos-settings-i3wm libx11
 
@@ -117,7 +115,9 @@ baph:
 	@cd $(PKG)/baph && sudo make install
 
 onlyoffice:
-	@$(AU) -i onlyoffice-bin $(NOC) -a
+	@$(BAPH)$(N) $@-bin 
+raindrop:
+	@$(BAPH)$(N) $@
 
 pkgclean:
 	cd $(PKG) && sudo rm -rf det/ doi/ dtop/ fetch/ px/ rot/ shot/ sxat/ wtf/ dacam/ baph/
