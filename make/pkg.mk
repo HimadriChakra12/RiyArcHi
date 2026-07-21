@@ -38,11 +38,7 @@ flatpak:
 mp3:
 	$(PACMAN) -S $(MP3)
 
-doi:
-	$(CLONE)
-	$(MK) && sudo make dmon-install
-
-sxat rsxiv swat:
+sxat rsxiv swat doi:
 	$(CLONE)
 	$(CD) && bash install.sh
 
