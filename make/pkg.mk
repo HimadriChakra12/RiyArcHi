@@ -20,7 +20,7 @@ RDFM = libfm libfm-gtk3 intltool libtool gettext pkg-config autoconf automake
 mp3 = id3 flac
 FLATPAK = com.github.tchx84.Flatseal it.mijorus.gearlever com.github.wwmm.easyeffects
 
-RI = songrec xdman-beta-bin jdownloader2 qbittorrent lollypop localsend-bin
+RI = songrec xdman-beta-bin jdownloader2 qbittorrent lollypop localsend-bin gnome-network-displays
 
 WAY ?=
 I3 = i3-wm i3blocks i3lock-color i3status eos-settings-i3wm libx11
@@ -117,3 +117,9 @@ zotero-install:
 		sudo ln -s "$(PKG)/Zotero/zotero-bin" "/usr/bin/zotero-bin"
 
 zotero: zotero-arc zotero-install
+
+miraclecast:
+	git clone https://github.com/albfan/miraclecast.git $(PKG)/miraclecast
+	cd $(PKG)/miraclecast && ./autogen.sh --prefix=/usr
+	cd $(PKG)/miraclecast && make
+	cd $(PKG)/miraclecast && sudo make install
