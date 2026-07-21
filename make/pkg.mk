@@ -47,9 +47,11 @@ sxat rsxiv swat:
 	$(CD) && bash install.sh
 
 rdfm:
-	@$(PACMAN) -S $(RDFM) $(NEED)
-	$(CLONE)
-	$(CD) && git checkout -b config && bash install.bash
+	-@$(PACMAN) -S $(RDFM) $(NEED)
+	-@$(CLONE)
+	-@$(CD) && \
+		git checkout -b config 2>/dev/null || git checkout config && \
+		bash install.bash
 
 rot fetch dtop shot whot det px pw wtf:
 	$(CLONE)
