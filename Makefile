@@ -80,7 +80,8 @@ waydroid:
 	sudo waydroid init
 	sudo waydroid container start
 
+
 .PHONY: dotfiles mimeconf base dots base base-install x way mime mpv pkgit bash rdfmconf gimp darktable \
 	dunst gh git i3 lazygit rofi okular alacritty tmux vim lyconf nvim shot px sxat rsxiv i3 clean pkgclean \
-	docker-install docker-configure docker-group docker-setup zotero chromium
+	docker-install docker-configure docker-group docker-setup zotero zotero-install zotero-arc chromium baph onlyoffice
 

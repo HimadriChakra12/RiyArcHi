@@ -8,3 +8,4 @@ CLONE       = -@$(GG) $(URL)/$@ $(PKG)/$@
 CD          = @cd $(PKG)/$@
 MK          = $(CD) && $(MAKE) 
 
+AU          = baph

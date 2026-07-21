@@ -22,6 +22,8 @@ FLATPAK = com.github.tchx84.Flatseal it.mijorus.gearlever com.github.wwmm.easyef
 
 RI = songrec xdman-beta-bin jdownloader2 qbittorrent lollypop localsend-bin gnome-network-displays
 
+BAPH = onlyoffice-bin
+
 WAY ?=
 I3 = i3-wm i3blocks i3lock-color i3status eos-settings-i3wm libx11
 
@@ -70,9 +72,6 @@ firefox:
 	@git checkout -b main
 	@bash $(PKG)/userChrome/firefox.sh
 
-spotify:
-	@yay -S --noconfirm spotify
-	@bash <(curl -sSL https://spotx-official.github.io/run.sh)
 
 easyeffects:
 	echo "Installing core PipeWire stack..."
@@ -90,9 +89,6 @@ gtk:
 	cd "$$HOME/.gtk/themes" && bash install.sh -n Gruvhim -c dark -l --tweaks medium float outline -s compact
 	gsettings set org.gnome.desktop.interface color-scheme prefer-dark
 
-pkgclean:
-	cd $(PKG) && sudo rm -rf det/ doi/ dtop/ fetch/ px/ rot/ shot/ sxat/ wtf/ dacam/
-
 chromium:
 	curl -Lo $(HOMEDIR)/Downloads/chromium-bin.pkg.tar.zst https://github.com/HimadriChakra12/ri/releases/download/chromium/chromium-bin-138.0.7204.183-1-x86_64.pkg.tar.zst
 	sudo pacman -U $(HOME)/Downloads/chromium-bin.pkg.tar.zst
@@ -106,7 +102,7 @@ zotero-arc:
 		mv Zotero_linux-x86_64 "$(PKG)/Zotero"
 
 zotero-install:
-	sudo chmod +x "$(PKG)/Zotero/zotero" "$(PKG)/Zotero/zotero-bin" "/usr/local/bin/zotero-bin" "/usr/local/bin/zotero" "/usr/local/bin/zotero" "/usr/local/bin/zotero" && \
+	@sudo chmod +x "$(PKG)/Zotero/zotero" "$(PKG)/Zotero/zotero-bin" "/usr/local/bin/zotero-bin" "/usr/local/bin/zotero" "/usr/local/bin/zotero" "/usr/local/bin/zotero" && \
 		sed -i 's|^Exec=.*|Exec=zotero|' "$(PKG)/Zotero/zotero.desktop" && \
 		install -Dm644 "$(PKG)/Zotero/zotero.desktop" "$(HOMEDIR)/.local/$(APP)/zotero.desktop" && \
 		sudo install -Dm644 "$(PKG)/Zotero/zotero.desktop" "/usr/$(APP)/zotero.desktop" && \
@@ -118,8 +114,12 @@ zotero-install:
 
 zotero: zotero-arc zotero-install
 
-miraclecast:
-	git clone https://github.com/albfan/miraclecast.git $(PKG)/miraclecast
-	cd $(PKG)/miraclecast && ./autogen.sh --prefix=/usr
-	cd $(PKG)/miraclecast && make
-	cd $(PKG)/miraclecast && sudo make install
+baph:
+	@$(GG) $(URL)/baph $(PKG)/baph
+	@cd $(PKG)/baph && sudo make install
+
+onlyoffice:
+	@$(AU) -i onlyoffice-bin $(NOC) -a
+
+pkgclean:
+	cd $(PKG) && sudo rm -rf det/ doi/ dtop/ fetch/ px/ rot/ shot/ sxat/ wtf/ dacam/ baph/
