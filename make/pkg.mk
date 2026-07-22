@@ -1,6 +1,7 @@
 APP = share/applications
 
-ZOTEROURL = https://download.zotero.org/client/release/9.0.6/Zotero-9.0.6_linux-x86_64.tar.xz
+ZOTEROVER = 9.0.6
+ZOTEROURL = https://download.zotero.org/client/release/$(ZOTEROVER)/Zotero-$(ZOTEROVER)_linux-x86_64.tar.xz
 
 # PAKCAGES
 XORG = xorg-server xorg-xinit xorg-apps xorg-xbacklight xbindkeys xorg-xdpyinfo xss-lock xorg-server xorg-xinit xorg-xauth xorg-xrandr xorg-fonts-misc xorg-xsetroot xclip picom
