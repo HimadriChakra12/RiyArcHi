@@ -1,5 +1,6 @@
 CTL   = sudo systemctl
 GG    = git clone
+dGG = -@[ -d $(PKG)/$@ ] || $(GG) 
 URL   = https://github.com/HimadriChakra12
 MAKE  = make && sudo make install
 

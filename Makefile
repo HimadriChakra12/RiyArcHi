@@ -3,6 +3,7 @@ include make/help.mk
 
 HOMEDIR ?= $(shell getent passwd $$(logname 2>/dev/null || echo $(SUDO_USER)) | cut -d: -f6)
 HOMEDIR ?= $(shell getent passwd $$(logname) | cut -d: -f6)
+RIYA := $(shell pwd)
 
 include make/command.mk
 include make/dots.mk
@@ -14,7 +15,6 @@ include make/docker.mk
 include make/wifi.mk
 include make/wine.mk
 
-RIYA := $(shell pwd)
 
 all: welcome-banner2 time base dots
 
@@ -80,6 +80,8 @@ waydroid:
 	sudo waydroid init
 	sudo waydroid container start
 
+zotero-clean:
+	rm -rf $(HOMEDIR)/.mozilla
 
 .PHONY: dotfiles mimeconf base dots base base-install x way mime mpv pkgit bash rdfmconf gimp darktable \
 	dunst gh git i3 lazygit rofi okular alacritty tmux vim lyconf nvim shot px sxat rsxiv i3 clean pkgclean \

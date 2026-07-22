@@ -25,6 +25,9 @@ RI = songrec xdman-beta-bin jdownloader2 qbittorrent lollypop localsend-bin gnom
 WAY ?=
 I3 = i3-wm i3blocks i3lock-color i3status eos-settings-i3wm libx11
 
+pkgclean:
+	cd $(PKG) && sudo rm -rf det/ doi/ dtop/ fetch/ px/ rot/ shot/ sxat/ wtf/ dacam/ baph/
+
 mingw:
 	$(PACMAN) -S mingw-w64-gcc
 
@@ -119,5 +122,8 @@ onlyoffice:
 raindrop:
 	@$(BAPH)$(N) $@
 
-pkgclean:
-	cd $(PKG) && sudo rm -rf det/ doi/ dtop/ fetch/ px/ rot/ shot/ sxat/ wtf/ dacam/ baph/
+omnisearch:
+	#$(PACMAN) -S libxml2 curl $(NOC)
+	-$(dGG) https://git.bwaaa.monster/$@ $(PKG)/$@
+	cd $(PKG)/omnisearch && \
+	docker compose up -d --build
