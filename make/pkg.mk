@@ -123,7 +123,7 @@ raindrop:
 	@$(BAPH)$(N) $@
 
 omnisearch:
-	#$(PACMAN) -S libxml2 curl $(NOC)
-	-$(dGG) https://git.bwaaa.monster/$@ $(PKG)/$@
-	cd $(PKG)/omnisearch && \
+	-@$(PACMAN) -S libxml2 curl $(NOC)
+	-@$(dGG) https://git.bwaaa.monster/$@ $(PKG)/$@
+	@cd $(PKG)/omnisearch && \
 	docker compose up -d --build
