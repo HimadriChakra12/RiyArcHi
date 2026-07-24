@@ -16,6 +16,7 @@ include make/wifi.mk
 include make/wine.mk
 
 
+
 all: welcome-banner2 time base dots
 
 time:

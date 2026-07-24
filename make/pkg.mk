@@ -4,10 +4,18 @@ ZOTEROVER = 9.0.6
 ZOTEROURL = https://download.zotero.org/client/release/$(ZOTEROVER)/Zotero-$(ZOTEROVER)_linux-x86_64.tar.xz
 
 # PAKCAGES
-XORG = xorg-server xorg-xinit xorg-apps xorg-xbacklight xbindkeys xorg-xdpyinfo xss-lock xorg-server xorg-xinit xorg-xauth xorg-xrandr xorg-fonts-misc xorg-xsetroot xclip picom
-EASYEFF = pipewire  pipewire-alsa  pipewire-pulse pipewire-jack wireplumber gst-plugin-pipewire lsp-plugins calf zam-plugins rnnoise easyeffects
-CORE = libnotify dbus nwg-look numlockx brightnessctl redshift acpi arandr alsa-utils zip unzip pavucontrol dex pacman-contrib 
-SHELLUTIL = curl github-cli lazygit neovim unzip 7zip zoxide awesome-terminal-fonts yt-dlp sysstat tumbler playerctl network-manager-applet wlctl-bin bluetui eza
+XORG = xorg-server xorg-xinit xorg-apps xorg-xbacklight xbindkeys xorg-xdpyinfo xss-lock \
+	   xorg-server xorg-xinit xorg-xauth xorg-xrandr xorg-fonts-misc xorg-xsetroot xclip picom
+
+EASYEFF = pipewire  pipewire-alsa  pipewire-pulse pipewire-jack wireplumber \
+		  gst-plugin-pipewire lsp-plugins calf zam-plugins rnnoise easyeffects
+
+CORE = libnotify dbus nwg-look numlockx brightnessctl redshift \
+	   acpi arandr alsa-utils zip unzip pavucontrol dex pacman-contrib 
+
+SHELLUTIL = curl github-cli lazygit neovim unzip 7zip zoxide awesome-terminal-fonts \
+			yt-dlp sysstat tumbler playerctl network-manager-applet wlctl-bin bluetui eza
+
 CLANG = clang gcc
 LANG = python python-pipx go rustup jq
 ROFI = rofi rofi-greenclip
@@ -51,7 +59,7 @@ rdfm:
 		git checkout -b config 2>/dev/null || git checkout config && \
 		bash install.bash
 
-rot fetch dtop shot whot det px pw wtf:
+baph rot fetch dtop shot whot det px pw wtf:
 	$(CLONE)
 	$(MK)
 
@@ -83,10 +91,10 @@ easyeffects:
 
 gtk:
 	$(PACMAN) -S $(GTK)
-	if [ ! -d "$$HOME/.gtk" ]; then \
-		git clone https://github.com/Fausto-Korpsvart/Gruvbox-GTK-Theme "$$HOME/.gtk" --depth 1; \
+	if [ ! -d "$(HOMEDIR)/.gtk" ]; then \
+		git clone https://github.com/Fausto-Korpsvart/Gruvbox-GTK-Theme "$(HOMEDIR)/.gtk" --depth 1; \
 	fi
-	cd "$$HOME/.gtk/themes" && bash install.sh -n Gruvhim -c dark -l --tweaks medium float outline -s compact
+	cd "$(HOMEDIR)/.gtk/themes" && bash install.sh -n Gruvhim -c dark -l --tweaks medium float outline -s compact
 	gsettings set org.gnome.desktop.interface color-scheme prefer-dark
 
 chromium:
@@ -114,12 +122,9 @@ zotero-install:
 
 zotero: zotero-arc zotero-install
 
-baph:
-	@$(GG) $(URL)/baph $(PKG)/baph
-	@cd $(PKG)/baph && sudo make install
-
 onlyoffice:
 	@$(BAPH)$(N) $@-bin 
+
 raindrop:
 	@$(BAPH)$(N) $@
 
